@@ -167,7 +167,9 @@ layers configuration."
 
 (defun dotspacemacs/user-config ()
   (add-hook 'doc-view-mode-hook 'auto-revert-mode)
-  (setq ispell-program-name "C:/cygwin64/bin/aspell.exe")
+  (if (eq system-type 'windows-nt)
+    (setq ispell-program-name "C:/cygwin64/bin/aspell.exe")
+  )
   (set-default 'preview-scale-function 1.0)
   (set-default 'LaTeX-fill-break-at-separators (quote (\\\( \\\[ $)))
   (add-hook 'LaTeX-mode-hook
