@@ -183,6 +183,60 @@ layers configuration."
   ;; Also in visual mode
   (define-key evil-visual-state-map "j" 'evil-next-visual-line)
   (define-key evil-visual-state-map "k" 'evil-previous-visual-line)
+
+  ;; custom key bindings for LaTeX
+  (dolist (mode '(tex-mode latex-mode))
+    (when latex-enable-folding
+      (spacemacs/set-leader-keys-for-major-mode mode
+        "zB" 'TeX-fold-clearout-buffer
+        "zR" 'TeX-fold-clearout-region)))
+  (add-hook 'LaTeX-mode-hook
+            (lambda ()
+              ;; (push '(?d . ("\\[ " . " \\]")) evil-surround-pairs-alist)
+              (push '(?\\ . evil-surround-read-escaped) evil-surround-pairs-alist)
+              ))
+
+  (defun evil-select-escaped-paren (beg end type count &optional inclusive)
+    (let* ((char ?\( ) ;; (read-char))
+           (pairs-alist
+            '((?\( . ("\\\\\(" . "\\\\\)"))
+              (?\[ . ("\\\\\\[" . "\\\\\\]"))
+              (?\{ . ("\\\\\\{" . "\\\\\\}"))
+              (?\) . ("\\\\\(" . "\\\\\)"))
+              (?\] . ("\\\\\\[" . "\\\\\\]"))
+              (?\} . ("\\\\\\{" . "\\\\\\}"))))
+           (pair (assoc-default char pairs-alist)))
+      (evil-select-paren (car pair) (cdr pair) beg end type count inclusive)))
+
+  (defun evil-surround-read-escaped ()
+    "Read a character, and surround text with that character, escaped by \\"
+    (let* ((char(read-char))
+           (pairs-alist
+            '((?\( . ("\\( " . " \\)"))
+              (?\[ . ("\\[ " . " \\]"))
+              (?\{ . ("\\{ " . " \\}"))
+              (?\) . ("\\(" . "\\)"))
+              (?\] . ("\\[" . "\\]"))
+              (?\} . ("\\{" . "\\}"))
+              (?\\ . ("\\" . "\\"))
+              ))
+           (pair (assoc-default char pairs-alist)))
+      (cond
+       ((consp pair) pair)
+       (t (cons (format "\\%c" char) (format "\\%c" char))))))
+
+  (evil-define-text-object evil-a-escaped-paren (count &optional beg end type)
+    "Select an escaped paren."
+    :extend-selection nil
+    (evil-select-escaped-paren beg end type count t))
+
+  (evil-define-text-object evil-inner-escaped-paren (count &optional beg end type)
+    "Select inner escaped paren."
+    :extend-selection nil
+    (evil-select-escaped-paren beg end type count))
+
+  (define-key evil-outer-text-objects-map "\\" 'evil-a-escaped-paren)
+  (define-key evil-inner-text-objects-map "\\" 'evil-inner-escaped-paren)
 )
 
 ;; Do not write anything past this comment. This is where Emacs will
