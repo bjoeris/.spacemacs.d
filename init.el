@@ -197,7 +197,7 @@ layers configuration."
               ))
 
   (defun evil-select-escaped-paren (beg end type count &optional inclusive)
-    (let* ((char ?\( ) ;; (read-char))
+    (let* ((char (read-char))
            (pairs-alist
             '((?\( . ("\\\\\(" . "\\\\\)"))
               (?\[ . ("\\\\\\[" . "\\\\\\]"))
@@ -210,7 +210,7 @@ layers configuration."
 
   (defun evil-surround-read-escaped ()
     "Read a character, and surround text with that character, escaped by \\"
-    (let* ((char(read-char))
+    (let* ((char (read-char))
            (pairs-alist
             '((?\( . ("\\( " . " \\)"))
               (?\[ . ("\\[ " . " \\]"))
